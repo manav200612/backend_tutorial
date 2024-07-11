@@ -7,3 +7,4 @@ const asynchandeler = (fn) => async (req,res,next) => {
     }
 }
 
+export {asynchandeler}
