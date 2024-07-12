@@ -23,6 +23,11 @@ import UserRouter from './routes/user.routes.js'
 
 // routes declared in routes
 
-app.use("/api/v1/users", UserRouter)
+app.use("/api/v1/users", UserRouter )
+
+// app.post("/api/v1/users/register", async (req, res) => {
+//     console.log("after");
+//     console.log(req);
+//     return res.json({"message": "Register"})})
 
 export {app}
