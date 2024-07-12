@@ -22,7 +22,8 @@ const uploadOnCloud = async (localfilepath) => {
         return response;
         
     } catch (error) {
-        fs.unlinkSync(localfilepath) //removce the temporary file as the upload failed
+        // fs.unlinkSync(localfilepath)
+        console.log("error in cloudinary", error); //removce the temporary file as the upload failed
         return null;
     }
 }
