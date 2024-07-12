@@ -1,6 +1,7 @@
 import { Router } from "express";
-import Registeruser from "../controllers/user.controler.js";
+import {loginuser, logoutuser, Registeruser} from "../controllers/user.controler.js";
 import { upload } from "../middlewares/multer.js";
+import { verifyjwt } from "../middlewares/auth.middleware.js";
 
 const router = Router()
 
@@ -16,6 +17,16 @@ router.route('/register').post(
         }
     ]),
     Registeruser)
+
+router.route("/login").post(loginuser)
+
+
+
+//secured routes
+router.route("/logout").post(verifyjwt, logoutuser)
+
+
+
 
 // router.post("/register", async (req, res) => {
 //     console.log("after");

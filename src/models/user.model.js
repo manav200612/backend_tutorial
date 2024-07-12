@@ -29,7 +29,7 @@ const userschema = new Schema({
         type: String,
         required: true,
     },
-    avatar: {
+    cover: {
         type: String,
     },
     watchhistory: [
