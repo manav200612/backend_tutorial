@@ -228,6 +228,27 @@ const refreshtaccesstoken = asynchandeler(async (req, res) => {
         throw new Apierror(401, error?.message) || "unauthenticated"
     }
 
+
+
+    const changecurrentpassword = asynchandeler(async(req,res)=> {
+        const {oldpassword, newpassword} = req.body
+
+        const user = await User.findById(req.user?.id)
+
+        const ispasswordcorrect = user.ispasswordcorrect(oldpassword)
+
+         if (!ispasswordcorrect) {
+            throw new Apierror(400, "invalid password")
+         }
+
+         user.password = newpassword
+         await user.save({validateBeforeSave: false})
+
+         return res.status(200)
+         .json(new Apiresponse(200, {}, "passwordchangessuccesfully"))
+
+    })
+
 })
 
 export {
