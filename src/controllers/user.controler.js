@@ -8,14 +8,14 @@ import { jwt } from "jsonwebtoken";
 
 
 
-const generateaccessandrefreshtoken = async(userid) => {
+const generateaccessandrefreshtoken = async (userid) => {
     try {
         const user = await User.findById(userid)
         const accesstoken = await user.generateaccesstoken()
         const refreshtoken = await user.generaterefreshtoken()
 
         user.refreshtoken = refreshtoken
-        await user.save({validateBeforeSave: false })
+        await user.save({ validateBeforeSave: false })
 
         return { accesstoken, refreshtoken }
 
@@ -127,7 +127,7 @@ const loginuser = asynchandeler(async (req, res) => {
         throw new Apierror(401, "paasword is not a valid password")
     }
 
-    const {accesstoken, refreshtoken} = await generateaccessandrefreshtoken(user._id)
+    const { accesstoken, refreshtoken } = await generateaccessandrefreshtoken(user._id)
 
     const loggedinuser = await User.findById(user._id).select("-password -refreshtoken")
 
@@ -139,21 +139,21 @@ const loginuser = asynchandeler(async (req, res) => {
     // console.log(accesstoken, refreshtoken);
 
     return res.status(200)
-    .cookie("accesstoken", accesstoken, options)
-    .cookie("refreshtoken", refreshtoken, options)
-    .json(
-        new Apiresponse(
-            200,
-            {
-                user: loggedinuser, accesstoken, refreshtoken
-            },
-            "user logged in succesfully"
+        .cookie("accesstoken", accesstoken, options)
+        .cookie("refreshtoken", refreshtoken, options)
+        .json(
+            new Apiresponse(
+                200,
+                {
+                    user: loggedinuser, accesstoken, refreshtoken
+                },
+                "user logged in succesfully"
+            )
         )
-    )
 
 })
 
-const logoutuser = asynchandeler(async(req,res) => {
+const logoutuser = asynchandeler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -172,21 +172,21 @@ const logoutuser = asynchandeler(async(req,res) => {
     }
 
     return res
-    .status(200)
-    .clearCookie("accesstoken", options)
-    .clearCookie("refreshtoken", options)
-    .json(
-        new Apiresponse(
-            200,
-            {},
-            "user logged out succesfully"))
+        .status(200)
+        .clearCookie("accesstoken", options)
+        .clearCookie("refreshtoken", options)
+        .json(
+            new Apiresponse(
+                200,
+                {},
+                "user logged out succesfully"))
 })
 
-const refreshtaccesstoken = asynchandeler(async(req,res) => {
+const refreshtaccesstoken = asynchandeler(async (req, res) => {
     const incomingrefreshtoken = req.cookies.refreshtoken || req.body.refreshtoken
 
     if (!incomingrefreshtoken) {
-        throw new Apierror(402,"unautherised request")
+        throw new Apierror(402, "unautherised request")
     }
 
     try {
@@ -194,36 +194,36 @@ const refreshtaccesstoken = asynchandeler(async(req,res) => {
             incomingrefreshtoken,
             process.env.REFRESH_TOKEN_SECRET
         )
-    
+
         const user = await User.findById(decodedtoken?._id)
-    
+
         if (!user) {
-            throw new Apierror(402,"invalid refresh token")
+            throw new Apierror(402, "invalid refresh token")
         }
-    
+
         if (incomingrefreshtoken !== user?.refreshtoken) {
-            throw new Apierror(403,"refresh token is expired or used")
+            throw new Apierror(403, "refresh token is expired or used")
         }
-    
+
         const options = {
             httpOnly: true,
             secure: true,
         }
-    
-        const {accesstoken, newrefreshtoken}= await generateaccessandrefreshtoken(user._id)
-    
+
+        const { accesstoken, newrefreshtoken } = await generateaccessandrefreshtoken(user._id)
+
         return res.status(200)
-        .cookie("accestoken". accesstoken, options)
-        .cookie("refreshtoken". newrefreshtoken, options)
-        .json(
-            new Apiresponse(
-                200,
-                {
-                    user: user.toObject({ getters: true }), accesstoken, newrefreshtoken
-                },
-                "access token refreshed successfully"
+            .cookie("accestoken".accesstoken, options)
+            .cookie("refreshtoken".newrefreshtoken, options)
+            .json(
+                new Apiresponse(
+                    200,
+                    {
+                        user: user.toObject({ getters: true }), accesstoken, newrefreshtoken
+                    },
+                    "access token refreshed successfully"
+                )
             )
-        )
     } catch (error) {
         throw new Apierror(401, error?.message) || "unauthenticated"
     }
